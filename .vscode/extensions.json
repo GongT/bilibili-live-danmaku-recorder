@@ -1,0 +1,9 @@
+{
+	"recommendations": [
+		"foxundermoon.shell-format",
+		"mads-hartmann.bash-ide-vscode",
+		"timonwong.shellcheck",
+		"visualstudioexptteam.vscodeintellicode",
+		"ms-python.python"
+	]
+}

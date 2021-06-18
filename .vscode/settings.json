@@ -1,0 +1,14 @@
+{
+	"python.pythonPath": ".venv/bin/python",
+	"python.linting.pylintEnabled": true,
+	"python.linting.enabled": true,
+	"python.formatting.provider": "yapf",
+	"python.linting.ignorePatterns": [
+		".vscode/*",
+		"**/site-packages/**/*.py",
+		"blivedm"
+	],
+	"[jsonc]": {
+		"editor.defaultFormatter": "vscode.json-language-features",
+	}
+}
