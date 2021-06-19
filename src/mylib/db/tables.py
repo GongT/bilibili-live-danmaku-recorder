@@ -152,9 +152,8 @@ def find_table(kind: str, room_id: int):
     print(f'Init table: {kind} -> {room_id}')
     if kind == MSG_KIND_NORMAL:
         ins = NormalDanmakuTable(room_id)
-    if kind == MSG_KIND_GIFT:
+    elif kind == MSG_KIND_GIFT:
         ins = GiftTable(room_id)
-    # elif kind== MSG_KIND_GIFT:
     # elif kind==MSG_KIND_GUARD:
     # elif kind==MSG_KIND_SUPER_CHAT:
     else:
