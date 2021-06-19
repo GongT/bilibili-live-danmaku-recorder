@@ -1,35 +1,19 @@
+import signal
 import argparse
 import asyncio
 from pathlib import Path
-from sys import stderr
 from pika import BasicProperties
 from pika.exceptions import UnroutableError
 import json
 from collector.brdige import BLiveDMBridge
-from mylib.mq import connect_message_queue
+from mylib.mq import connect_message_queue, add_arguments
 from mylib.constants import BODY_ADDON_KEY_ROOM_ID, MSG_KIND_GIFT, MSG_KIND_NORMAL, MSG_KIND_GUARD, MSG_KIND_SUPER_CHAT
-
-
-def url_parse(st):
-    from urllib.parse import urlparse
-    u = urlparse('http://' + st)
-    if u.username is None:
-        raise argparse.ArgumentError("URL中没有用户名")
-    if u.password is None:
-        raise argparse.ArgumentError("URL中没有密码")
-    if u.hostname is None:
-        raise argparse.ArgumentError("URL中没有服务器IP或域名")
-    if u.port is None:
-        raise argparse.ArgumentError("URL中没有端口")
-    return {"username": u.username, "password": u.password, "hostname": u.hostname, "port": u.port}
-
 
 parser = argparse.ArgumentParser(description='直播弹幕数据收集')
 parser.add_argument('rooms', metavar='id', nargs='+', type=int, help='直播间ID（URL结尾数字）')
-parser.add_argument('--server', '-s', type=url_parse, help='消息队列服务器URL（用户名:密码@服务器:端口）', required=True)
 parser.add_argument('--verbose', '-v', action='store_true', help='日志记录弹幕内容')
 parser.add_argument('--filter', type=str, help='弹幕过滤器文件', default=None)
-parser.add_argument('--cacert', type=str, help='（消息队列服务器）自签名根证书文件路径', default=None)
+add_arguments(parser)
 parser.epilog = '【弹幕过滤器文件】 可指定一个python文件，其中包含filter函数，参数是blivedm.DanmakuMessage，返回布尔值，为False时直接忽略该弹幕。礼物等信息无条件记录，不会调用该函数。'
 
 args = parser.parse_args()
@@ -66,7 +50,8 @@ def serialize_class(instance):
     return ret
 
 
-def create_log(room_id, kind, body):
+async def create_log(room_id, kind, body):
+    global rmq
     body = serialize_class(body)
     body[BODY_ADDON_KEY_ROOM_ID] = room_id
     content = json.dumps(body, ensure_ascii=False, check_circular=False).encode('utf8')
@@ -80,9 +65,17 @@ def create_log(room_id, kind, body):
                           mandatory=True)
     except UnroutableError:
         print(f'Message was returned: {content}')
+    except (exceptions.ConnectionClosed, exceptions.ChannelClosed) as error:
+        print('Try to reconnect rmq...')
+        rmq = connect_message_queue(args.server, args.cacert)
+    except Exception as e:
+        print(e.with_traceback())
+        exit(1)
+
 
 rmq = connect_message_queue(args.server, args.cacert)
 clients = []
+
 
 async def run(room_id):
     print(f'连接直播间：{room_id}')
@@ -97,6 +90,13 @@ async def stop_all():
     rmq.close()
 
 
+def signal_handler(*args):
+    asyncio.get_event_loop().run_until_complete(stop_all())
+
+
+signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGTERM, signal_handler)
+
 try:
     tasks = []
     for room_id in args.rooms:
@@ -104,6 +104,5 @@ try:
     asyncio.get_event_loop().run_until_complete(asyncio.wait(tasks))
 except KeyboardInterrupt:
     pass
-
 
 asyncio.get_event_loop().run_until_complete(stop_all())

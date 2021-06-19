@@ -23,6 +23,18 @@
 				"23178720", // 我老婆
 			],
 			"console": "internalConsole"
+		},
+		{
+			"name": "启动存储器",
+			"type": "python",
+			"request": "launch",
+			"program": "${workspaceFolder}/src/mapper.py",
+			"args": [
+				"--server=test-username:test-password@127.0.0.1:5671",
+				"--cacert=${workspaceFolder}/rabbitmq/certs/server.crt",
+				"--database=mariadb+mysqldb://blivedm-record:blivedm-record@localhost:3306/blivedm-record?unix_socket=/dev/shm/container-shared-socksets/mariadb.sock",
+			],
+			"console": "internalConsole"
 		}
 	]
 }

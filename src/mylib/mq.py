@@ -1,3 +1,5 @@
+from argparse import ArgumentParser
+import argparse
 from os import environ
 import ssl
 import pika
@@ -39,3 +41,23 @@ def connect_message_queue(u, tls_ca):
     rmq.queue_declare(queue=MSG_KIND_SUPER_CHAT, durable=True)
     rmq.confirm_delivery()
     return rmq
+
+
+def url_parse(st):
+    from urllib.parse import urlparse
+    u = urlparse('http://' + st)
+    if u.username is None:
+        raise argparse.ArgumentError("URL中没有用户名")
+    if u.password is None:
+        raise argparse.ArgumentError("URL中没有密码")
+    if u.hostname is None:
+        raise argparse.ArgumentError("URL中没有服务器IP或域名")
+    if u.port is None:
+        raise argparse.ArgumentError("URL中没有端口")
+    return {"username": u.username, "password": u.password, "hostname": u.hostname, "port": u.port}
+
+
+
+def add_arguments(parser:argparse.ArgumentParser) :
+    parser.add_argument('--server', '-s', type=url_parse, help='消息队列服务器URL（用户名:密码@服务器:端口）', required=True)
+    parser.add_argument('--cacert', type=str, help='（消息队列服务器）自签名根证书文件路径', default=None)
