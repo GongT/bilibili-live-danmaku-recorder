@@ -7,3 +7,4 @@ rabbitmq/certs
 rabbitmq/db
 rabbitmq/logs
 rabbitmq/__rabbitmq.conf
+.env

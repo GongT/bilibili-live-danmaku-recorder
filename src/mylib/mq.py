@@ -1,10 +1,13 @@
+from os import environ
 import ssl
 import pika
 from .constants import MSG_KIND_NORMAL, MSG_KIND_GIFT, MSG_KIND_GUARD, MSG_KIND_SUPER_CHAT
 
 
 def connect_message_queue(u, tls_ca):
-    credentials = pika.PlainCredentials(u['username'], u['password'])
+    username = u['username']
+    password = u['password']
+    credentials = pika.PlainCredentials(username, password)
 
     ssl_ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
     ssl_ctx.verify_mode = ssl.CERT_REQUIRED
@@ -21,7 +24,7 @@ def connect_message_queue(u, tls_ca):
                                              credentials=credentials,
                                              ssl_options=pika.SSLOptions(ssl_ctx))
 
-    print(f"连接 RabbitMQ -> {u['hostname']}:{u['port']}")
+    print(f"连接 RabbitMQ -> {username}:{password}@{u['hostname']}:{u['port']}")
     try:
         connection = pika.BlockingConnection(connect_info)
         if connection.is_open:

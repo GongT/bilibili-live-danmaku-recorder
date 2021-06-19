@@ -83,8 +83,6 @@ def create_log(room_id, kind, body):
 
 rmq = connect_message_queue(args.server, args.cacert)
 clients = []
-print(rmq.basic_publish('','', 'test publish'))
-
 
 async def run(room_id):
     print(f'连接直播间：{room_id}')
@@ -105,8 +103,6 @@ try:
         tasks.append(asyncio.ensure_future(run(room_id)))
     asyncio.get_event_loop().run_until_complete(asyncio.wait(tasks))
 except KeyboardInterrupt:
-    pass
-except SystemExit:
     pass
 
 

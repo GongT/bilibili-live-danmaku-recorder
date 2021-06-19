@@ -8,6 +8,7 @@
 		"**/site-packages/**/*.py",
 		"blivedm"
 	],
+	"python.envFile": "${workspaceFolder}/.env",
 	"[jsonc]": {
 		"editor.defaultFormatter": "vscode.json-language-features",
 	}

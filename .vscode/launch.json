@@ -10,7 +10,7 @@
 			"request": "launch",
 			"program": "${workspaceFolder}/src/collector.py",
 			"args": [
-				"--server=test-user:bb7c9e27b187b89816079f9a45631e3260b471c8a1516084bdd1fff17bfaca50@127.0.0.1:5671",
+				"--server=test-username:test-password@127.0.0.1:5671",
 				"--cacert=${workspaceFolder}/rabbitmq/certs/server.crt",
 				"--filter=${workspaceFolder}/src/collector/filter.example.py",
 				"--verbose",

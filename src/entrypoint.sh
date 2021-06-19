@@ -8,4 +8,4 @@ fi
 
 echo "running $APP $*" >&2
 cd /app
-python "${APP}.py" "$@"
+exec python3 "${APP}.py" "$@"
