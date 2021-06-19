@@ -1,0 +1,28 @@
+{
+	// 使用 IntelliSense 了解相关属性。 
+	// 悬停以查看现有属性的描述。
+	// 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "启动收集器",
+			"type": "python",
+			"request": "launch",
+			"program": "${workspaceFolder}/src/collector.py",
+			"args": [
+				"--server=test-user:bb7c9e27b187b89816079f9a45631e3260b471c8a1516084bdd1fff17bfaca50@127.0.0.1:5671",
+				"--cacert=${workspaceFolder}/rabbitmq/certs/server.crt",
+				"--filter=${workspaceFolder}/src/collector/filter.example.py",
+				"--verbose",
+				"1485080", // 撒子
+				"21712635", // 狮子
+				"22333522", // 万子
+				"21627536", // 嘻嘻
+				"21919321", // 猫猫
+				"505645", // 我
+				"23178720", // 我老婆
+			],
+			"console": "internalConsole"
+		}
+	]
+}

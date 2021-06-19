@@ -4,6 +4,7 @@
 		"mads-hartmann.bash-ide-vscode",
 		"timonwong.shellcheck",
 		"visualstudioexptteam.vscodeintellicode",
-		"ms-python.python"
+		"ms-python.python",
+		"yzhang.markdown-all-in-one"
 	]
 }
