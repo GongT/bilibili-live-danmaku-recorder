@@ -44,7 +44,7 @@ def callback(kind: str, ch: BlockingChannel, method: spec.Basic.Deliver, propert
         print(" | " + body.decode('utf-8'), file=stderr)
         ch.basic_nack(method.delivery_tag)
     else:
-        # ch.basic_ack(method.delivery_tag)
+        ch.basic_ack(method.delivery_tag)
         pass
 
 
@@ -62,7 +62,7 @@ engine = create_connection(args.database)
 rmq = connect_message_queue(args.server, args.cacert)
 
 register_handler(MSG_KIND_GIFT)
-# register_handler(MSG_KIND_NORMAL)
+register_handler(MSG_KIND_NORMAL)
 # register_handler(MSG_KIND_GUARD)
 # register_handler(MSG_KIND_SUPER_CHAT)
 
