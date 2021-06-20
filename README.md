@@ -14,7 +14,7 @@
 
 ### 第二步：启动mapper
 ```bash
-podman run -d docker.io/gongt/bilibili-live-dnamu-mapper \
+podman run -d docker.io/gongt/bilibili-live-danmu-mapper \
 	"--server=用户名:密码@服务器:端口" \       # 之前设置的RabbitMQ连接方式，端口即使默认也必须写明
 	"--cacert=/config/server.crt" \          # 如果使用自签名证书，则需要cacert，否则不需要
 	"--database=$CONNECTION"                 # 保存数据库的连接方式
@@ -31,7 +31,7 @@ podman run -d docker.io/gongt/bilibili-live-dnamu-mapper \
 
 ### 第三步：确定collector的参数并运行
 ```bash
-podman run -d docker.io/gongt/bilibili-live-dnamu-recorder \
+podman run -d docker.io/gongt/bilibili-live-danmu-collector \
 	"--server=用户名:密码@服务器:端口" \       # 之前设置的RabbitMQ连接方式，端口即使默认也必须写明
 	"--cacert=/config/server.crt" \          # 如果使用自签名证书，则需要cacert，否则不需要
 	"--filter=/config/filter.py" \           # 设置弹幕过滤器的文件名，默认不过滤

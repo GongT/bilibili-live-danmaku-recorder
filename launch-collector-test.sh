@@ -13,7 +13,6 @@ fi
 
 IO_ARG+=("--volume=$(pwd):/__src:ro" "--network=host")
 
-source .env
 ARGS=(
 	"--server=test-username:test-password@10.0.0.102:5671"
 	"--cacert=/__src/rabbitmq/certs/server.crt"
@@ -28,4 +27,4 @@ ARGS=(
 )
 
 set -x
-podman run --name blivedm-rec-localtest "${IO_ARG[@]}" docker.io/gongt/bilibili-live-dnamu-recorder "${ARGS[@]}"
+podman run --name blivedm-rec-localtest "${IO_ARG[@]}" docker.io/gongt/bilibili-live-danmu-collector "${ARGS[@]}"
