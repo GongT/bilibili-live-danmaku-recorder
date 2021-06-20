@@ -2,8 +2,9 @@ import signal
 import argparse
 import asyncio
 from pathlib import Path
+from sys import stderr
 from pika import BasicProperties
-from pika.exceptions import UnroutableError
+from pika.exceptions import UnroutableError, AMQPConnectionError, ChannelClosed, ChannelWrongStateError
 import json
 from collector.brdige import BLiveDMBridge
 from mylib.mq import connect_message_queue, add_arguments
@@ -50,27 +51,39 @@ def serialize_class(instance):
     return ret
 
 
+lock = asyncio.Lock()
+
+
 async def create_log(room_id, kind, body):
     global rmq
     body = serialize_class(body)
     body[BODY_ADDON_KEY_ROOM_ID] = room_id
     content = json.dumps(body, ensure_ascii=False, check_circular=False).encode('utf8')
-    try:
-        rmq.basic_publish(exchange='',
-                          routing_key=kind,
-                          body=content,
-                          properties=BasicProperties(content_type='application/json',
-                                                     content_encoding='utf-8',
-                                                     delivery_mode=2),
-                          mandatory=True)
-    except UnroutableError:
-        print(f'Message was returned: {content}')
-    except (exceptions.ConnectionClosed, exceptions.ChannelClosed) as error:
-        print('Try to reconnect rmq...')
-        rmq = connect_message_queue(args.server, args.cacert)
-    except Exception as e:
-        print(e.with_traceback())
-        exit(1)
+
+    tryies = 0
+    while True:
+        try:
+            rmq.basic_publish(exchange='',
+                              routing_key=kind,
+                              body=content,
+                              properties=BasicProperties(content_type='application/json',
+                                                         content_encoding='utf-8',
+                                                         delivery_mode=2),
+                              mandatory=True)
+        except UnroutableError:
+            print(f'message was rejected: {content}', file=stderr)
+        except (AMQPConnectionError, ChannelClosed, ConnectionResetError, ChannelWrongStateError) as error:
+            tryies += 1
+            print(f'connection lost: {error}, try to reconnect ({tryies} times)...')
+            await asyncio.sleep(1)
+            async with lock:
+                if rmq.is_closed:
+                    rmq = connect_message_queue(args.server, args.cacert)
+            continue
+        except Exception as e:
+            print("<FATAL> publish rabbitmq failed:", type(e), e)
+            exit(1)
+        break
 
 
 rmq = connect_message_queue(args.server, args.cacert)

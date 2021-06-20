@@ -46,9 +46,16 @@ if ! systemctl is-active --quiet "$SRV_NAME"; then
 		rabbitmq-server
 fi
 
+echo ""
+echo ""
+echo "LOGFILE = $RABBITMQ_LOGS"
+echo ""
+echo ""
+
 while ! grep --fixed-strings 'started TLS (SSL) listener on' "$RABBITMQ_LOGS" 2>/dev/null; do
 	sleep 5
 done
+
 
 rabbitmqctl add_user "$RMQ_USER" "$RMQ_PASS" || rabbitmqctl change_password "$RMQ_USER" "$RMQ_PASS"
 rabbitmqctl set_permissions "$RMQ_USER" ".*" ".*" ".*"

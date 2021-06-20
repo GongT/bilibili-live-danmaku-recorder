@@ -219,6 +219,7 @@ class GuardBuyMessage:
 
     @classmethod
     def from_command(cls, data: dict):
+        print("上舰消息：", data)
         return cls(
             data['uid'], data['username'], data['guard_level'], data['num'], data['price'],
             data['gift_id'], data['gift_name'], data['start_time'], data['end_time']
