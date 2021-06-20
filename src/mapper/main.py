@@ -63,8 +63,8 @@ rmq = connect_message_queue(args.server, args.cacert)
 
 register_handler(MSG_KIND_GIFT)
 register_handler(MSG_KIND_NORMAL)
-# register_handler(MSG_KIND_GUARD)
-# register_handler(MSG_KIND_SUPER_CHAT)
+register_handler(MSG_KIND_GUARD)
+register_handler(MSG_KIND_SUPER_CHAT)
 
 try:
     rmq.start_consuming()

@@ -14,7 +14,7 @@ def is_special_key(k: str):
 
 class BaseTable():
     @abstractmethod
-    def create_columns(self, room_id: int) -> list[Column]:
+    def create_columns(self) -> list[Column]:
         raise NotImplementedError()
 
     @abstractmethod
@@ -33,7 +33,7 @@ class BaseTable():
         self.table_name = table_name(room_id, self.get_table_kind())
         self.metadata = MetaData()
 
-        columns = self.create_columns(room_id)
+        columns = self.create_columns()
         self.table = Table(
             self.table_name,
             self.metadata,
@@ -81,7 +81,7 @@ class NormalDanmakuTable(BaseTable):
     def get_table_kind():
         return MSG_KIND_NORMAL
 
-    def create_columns(self, room_id: int) -> list[Column]:
+    def create_columns(self) -> list[Column]:
         return [
             Column('mode', SmallInteger, comment="弹幕显示模式（滚动、顶部、底部）", nullable=False),
             Column('font_size', SmallInteger, comment="字体尺寸", nullable=False),
@@ -117,19 +117,19 @@ class NormalDanmakuTable(BaseTable):
 
 class GiftTable(BaseTable):
     def hash_row(self, row) -> str:
-        return f'{row["uid"]}{row["gift_id"]}{row["timestamp"]}{row["rnd"]}'
+        return f'{row["uid"]}{row["num"]}{row["gift_id"]}{row["timestamp"]}{row["rnd"]}'
 
     @staticmethod
     def get_table_kind():
         return MSG_KIND_GIFT
 
-    def create_columns(self, room_id: int) -> list[Column]:
+    def create_columns(self) -> list[Column]:
         return [
             Column('gift_name', String(128), comment="礼物名", nullable=False),
             Column('num', Integer, comment="礼物数量", nullable=False),
             Column('uname', String(128), comment="用户名", nullable=False),
             Column('face', Text, comment="用户头像URL", nullable=False),
-            Column('guard_level', Integer, comment="舰队等级，0非舰队，1总督，2提督，3舰长", nullable=False),
+            Column('guard_level', SmallInteger, comment="舰队等级，0非舰队，1总督，2提督，3舰长", nullable=False),
             Column('uid', BigInteger, comment="用户ID", nullable=False),
             Column('timestamp', BigInteger, comment="时间戳", nullable=False),
             Column('gift_id', Integer, comment="礼物ID", nullable=False),
@@ -139,6 +139,60 @@ class GiftTable(BaseTable):
             Column('rnd', String(64), comment="随机数", nullable=False),
             Column('coin_type', String(32), comment="瓜子类型，'silver'或'gold'", nullable=False),
             Column('total_coin', Integer, comment="总瓜子数", nullable=False),
+        ]
+
+
+class GuardTable(BaseTable):
+    def hash_row(self, row) -> str:
+        return f'{row["uid"]}{row["num"]}{row["gift_id"]}{row["end_time"]}'
+
+    @staticmethod
+    def get_table_kind():
+        return MSG_KIND_GUARD
+
+    def create_columns(self) -> list[Column]:
+        return [
+            Column('uid', BigInteger, comment='用户ID', nullable=False),
+            Column('username', String(128), comment='用户名', nullable=False),
+            Column('guard_level', SmallInteger, comment='舰队等级，0非舰队，1总督，2提督，3舰长', nullable=False),
+            Column('num', Integer, comment='数量', nullable=False),
+            Column('price', Integer, comment='单价金瓜子数', nullable=False),
+            Column('gift_id', Integer, comment='礼物ID', nullable=False),
+            Column('gift_name', String(128), comment='礼物名', nullable=False),
+            Column('start_time', BigInteger, comment='开始时间戳？', nullable=False),
+            Column('end_time', BigInteger, comment='结束时间戳？', nullable=False),
+        ]
+
+
+class SuperChatTable(BaseTable):
+    def hash_row(self, row) -> str:
+        return f'{row["uid"]}{row["gift_id"]}{row["message"]}{row["start_time"]}'
+
+    @staticmethod
+    def get_table_kind():
+        return MSG_KIND_SUPER_CHAT
+
+    def create_columns(self) -> list[Column]:
+        return [
+            Column('price', Integer, comment='价格（人民币）', nullable=False),
+            Column('message', String(200), comment='消息', nullable=False),
+            Column('message_jpn', String(200), comment='消息日文翻译（目前只出现在SUPER_CHAT_MESSAGE_JPN）', nullable=False),
+            Column('start_time', BigInteger, comment='开始时间戳', nullable=False),
+            Column('end_time', BigInteger, comment='结束时间戳', nullable=False),
+            Column('time', Integer, comment='剩余时间', nullable=False),
+            Column('id', BigInteger, comment='消息ID，删除时用', nullable=False),
+            Column('gift_id', Integer, comment='礼物ID', nullable=False),
+            Column('gift_name', String(128), comment='礼物名', nullable=False),
+            Column('uid', BigInteger, comment='用户ID', nullable=False),
+            Column('uname', String(128), comment='用户名', nullable=False),
+            Column('face', Text, comment='用户头像URL', nullable=False),
+            Column('guard_level', SmallInteger, comment='舰队等级，0非舰队，1总督，2提督，3舰长', nullable=False),
+            Column('user_level', Integer, comment='用户等级', nullable=False),
+            Column('background_bottom_color', String(32), comment='底部背景色', nullable=False),
+            Column('background_color', String(32), comment='背景色', nullable=False),
+            Column('background_icon', Text, comment='背景图标', nullable=False),
+            Column('background_image', Text, comment='背景图', nullable=False),
+            Column('background_price_color', String(32), comment='背景价格颜色', nullable=False),
         ]
 
 
@@ -154,8 +208,10 @@ def find_table(kind: str, room_id: int):
         ins = NormalDanmakuTable(room_id)
     elif kind == MSG_KIND_GIFT:
         ins = GiftTable(room_id)
-    # elif kind==MSG_KIND_GUARD:
-    # elif kind==MSG_KIND_SUPER_CHAT:
+    elif kind == MSG_KIND_GUARD:
+        ins = GuardTable(room_id)
+    elif kind == MSG_KIND_SUPER_CHAT:
+        ins = SuperChatTable(room_id)
     else:
         return None
     if kind not in cache:
