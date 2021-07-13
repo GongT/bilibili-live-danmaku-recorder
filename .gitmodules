@@ -1,6 +1,6 @@
-[submodule "collector/blivedm"]
-	path = collector/blivedm
-	url = git@github.com:xfgryujk/blivedm
 [submodule "container/builder"]
 	path = container/builder
 	url = git@github.com:GongT/containers-builder.git
+[submodule "src/collector/blivedm"]
+	path = src/collector/blivedm
+	url = git@github.com:xfgryujk/blivedm

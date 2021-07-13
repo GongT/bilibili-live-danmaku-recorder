@@ -8,21 +8,29 @@ def noop(*_args):
 
 
 class BLiveDMBridge(BLiveClient):
-    _COMMAND_HANDLERS = BLiveClient._COMMAND_HANDLERS.copy()
-
-    _COMMAND_HANDLERS['STOP_LIVE_ROOM_LIST'] = None
-    _COMMAND_HANDLERS['WIDGET_BANNER'] = None
-    _COMMAND_HANDLERS['ONLINE_RANK_COUNT'] = None
-    _COMMAND_HANDLERS['ONLINE_RANK_V2'] = None
-    _COMMAND_HANDLERS['ONLINE_RANK_TOP3'] = None
-    _COMMAND_HANDLERS['HOT_RANK_CHANGED'] = None
-
     def __init__(self, room_id, callback, uid=0, log_dm=False, dm_filter=None):
         super().__init__(room_id, uid=uid, ssl=True)
         if not log_dm:
             self.debug_msg_log = noop
         self.dm_filter = dm_filter
         self.callback = callback
+
+        async def __debug_show_data(self, command):
+            print(command, file=stderr)
+
+        handlers = BLiveClient._COMMAND_HANDLERS.copy()
+        # handlers['STOP_LIVE_ROOM_LIST'] = None
+        # handlers['WIDGET_BANNER'] = None
+        # handlers['ONLINE_RANK_COUNT'] = None
+        # handlers['ONLINE_RANK_V2'] = None
+        # handlers['ONLINE_RANK_TOP3'] = None
+        # handlers['HOT_RANK_CHANGED'] = None
+        handlers['INTERACT_WORD'] = __debug_show_data
+        handlers['ENTRY_EFFECT'] = __debug_show_data
+        handlers['WELCOME_GUARD'] = __debug_show_data
+        handlers['WELCOME'] = __debug_show_data
+        handlers['room_admin_entrance'] = __debug_show_data
+        self._COMMAND_HANDLERS = handlers
 
     def debug_msg_log(self, room: int, msg: str):
         print(msg, file=stderr)
