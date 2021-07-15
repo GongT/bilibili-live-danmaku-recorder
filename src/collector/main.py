@@ -1,5 +1,4 @@
 import signal
-import argparse
 import asyncio
 from pathlib import Path
 from sys import stderr
@@ -7,17 +6,9 @@ from pika import BasicProperties
 from pika.exceptions import UnroutableError, AMQPConnectionError, ChannelClosed, ChannelWrongStateError
 import json
 from collector.brdige import BLiveDMBridge
-from mylib.mq import connect_message_queue, add_arguments
+from mylib.mq import connect_message_queue
 from mylib.constants import BODY_ADDON_KEY_ROOM_ID, MSG_KIND_GIFT, MSG_KIND_NORMAL, MSG_KIND_GUARD, MSG_KIND_SUPER_CHAT
-
-parser = argparse.ArgumentParser(description='直播弹幕数据收集')
-parser.add_argument('rooms', metavar='id', nargs='+', type=int, help='直播间ID（URL结尾数字）')
-parser.add_argument('--verbose', '-v', action='store_true', help='日志记录弹幕内容')
-parser.add_argument('--filter', type=str, help='弹幕过滤器文件', default=None)
-add_arguments(parser)
-parser.epilog = '【弹幕过滤器文件】 可指定一个python文件，其中包含filter函数，参数是blivedm.DanmakuMessage，返回布尔值，为False时直接忽略该弹幕。礼物等信息无条件记录，不会调用该函数。'
-
-args = parser.parse_args()
+from collector.args import args
 
 
 def danmaku_filter():
@@ -45,9 +36,17 @@ if args.filter is not None:
 
 
 def serialize_class(instance):
+    if type(instance) == dict:
+        return instance
+
     ret = {}
-    for attribute, value in instance.__dict__.items():
-        ret[attribute] = value
+    if hasattr(instance, '__dict__'):
+        for attribute, value in instance.__dict__.items():
+            ret[attribute] = value
+    else:
+        print(type(instance))
+        print(instance)
+        raise Exception("serialize_class：不知道是什么：" + str(type(instance)))
     return ret
 
 
@@ -92,7 +91,7 @@ clients = []
 
 async def run(room_id):
     print(f'连接直播间：{room_id}')
-    client = BLiveDMBridge(room_id, callback=create_log, log_dm=args.verbose, dm_filter=danmaku_filter)
+    client = BLiveDMBridge(room_id, callback=create_log, dm_filter=danmaku_filter)
     clients.append(client)
     await client.start()
 

@@ -3,7 +3,12 @@ import argparse
 from os import environ
 import ssl
 import pika
-from .constants import MSG_KIND_NORMAL, MSG_KIND_GIFT, MSG_KIND_GUARD, MSG_KIND_SUPER_CHAT
+from .constants import MSG_KIND_NORMAL, MSG_KIND_GIFT, MSG_KIND_GUARD, MSG_KIND_SUPER_CHAT, MSG_KIND_INTERACT_WORD, MSG_KIND_ENTRY_EFFECT, MSG_KIND_BATTLE_START, MSG_KIND_BATTLE_END, MSG_KIND_BATTLE_SETTLE
+
+QUEUE_NAMES = [
+    MSG_KIND_NORMAL, MSG_KIND_GIFT, MSG_KIND_GUARD, MSG_KIND_SUPER_CHAT, MSG_KIND_INTERACT_WORD, MSG_KIND_ENTRY_EFFECT,
+    MSG_KIND_BATTLE_START, MSG_KIND_BATTLE_END, MSG_KIND_BATTLE_SETTLE
+]
 
 
 def connect_message_queue(u, tls_ca):
@@ -35,10 +40,10 @@ def connect_message_queue(u, tls_ca):
         print('Error:', error.args)
         exit(1)
     rmq = connection.channel()
-    rmq.queue_declare(queue=MSG_KIND_NORMAL, durable=True)
-    rmq.queue_declare(queue=MSG_KIND_GIFT, durable=True)
-    rmq.queue_declare(queue=MSG_KIND_GUARD, durable=True)
-    rmq.queue_declare(queue=MSG_KIND_SUPER_CHAT, durable=True)
+
+    for i in QUEUE_NAMES:
+        rmq.queue_declare(queue=i, durable=True)
+
     rmq.confirm_delivery()
     return rmq
 
@@ -57,7 +62,6 @@ def url_parse(st):
     return {"username": u.username, "password": u.password, "hostname": u.hostname, "port": u.port}
 
 
-
-def add_arguments(parser:argparse.ArgumentParser) :
+def add_arguments(parser: argparse.ArgumentParser):
     parser.add_argument('--server', '-s', type=url_parse, help='消息队列服务器URL（用户名:密码@服务器:端口）', required=True)
     parser.add_argument('--cacert', type=str, help='（消息队列服务器）自签名根证书文件路径', default=None)
