@@ -35,6 +35,7 @@ if ! systemctl is-active --quiet "$SRV_NAME"; then
 	mkdir -p "$RABBITMQ_LOG_BASE" "$RABBITMQ_MNESIA_BASE"
 	chown rabbitmq "$RABBITMQ_LOG_BASE" "$RABBITMQ_MNESIA_BASE" -R
 
+	echo "run with name $SRV_NAME"
 	systemd-run --same-dir --no-ask-password --unit="$SRV_NAME" --quiet \
 		"--setenv=HOSTNAME=$HOSTNAME" \
 		"--setenv=RABBITMQ_CONFIG_FILE=$RABBITMQ_CONFIG_FILE" \
@@ -44,6 +45,8 @@ if ! systemctl is-active --quiet "$SRV_NAME"; then
 		"--setenv=RABBITMQ_CONSOLE_LOG=$RABBITMQ_CONSOLE_LOG" \
 		"--setenv=RABBITMQ_LOGS=$RABBITMQ_LOGS" \
 		rabbitmq-server
+else
+	echo "exists service name $SRV_NAME"
 fi
 
 echo ""
@@ -55,7 +58,6 @@ echo ""
 while ! grep --fixed-strings 'started TLS (SSL) listener on' "$RABBITMQ_LOGS" 2>/dev/null; do
 	sleep 5
 done
-
 
 rabbitmqctl add_user "$RMQ_USER" "$RMQ_PASS" || rabbitmqctl change_password "$RMQ_USER" "$RMQ_PASS"
 rabbitmqctl set_permissions "$RMQ_USER" ".*" ".*" ".*"
