@@ -1,6 +1,4 @@
-from argparse import ArgumentParser
 import argparse
-from os import environ
 import ssl
 import pika
 from .constants import MSG_KIND_NORMAL, MSG_KIND_GIFT, MSG_KIND_GUARD, MSG_KIND_SUPER_CHAT, MSG_KIND_INTERACT_WORD, MSG_KIND_ENTRY_EFFECT, MSG_KIND_BATTLE_START, MSG_KIND_BATTLE_END, MSG_KIND_BATTLE_SETTLE

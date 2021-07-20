@@ -1,2 +1,2 @@
 from .connection import *
-from .tables import *
+from .find_table import find_table

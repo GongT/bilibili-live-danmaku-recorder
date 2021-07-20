@@ -7,7 +7,7 @@ from pika.exceptions import UnroutableError, AMQPConnectionError, ChannelClosed,
 import json
 from collector.brdige import BLiveDMBridge
 from mylib.mq import connect_message_queue
-from mylib.constants import BODY_ADDON_KEY_ROOM_ID, MSG_KIND_GIFT, MSG_KIND_NORMAL, MSG_KIND_GUARD, MSG_KIND_SUPER_CHAT
+from mylib.constants import BODY_ADDON_KEY_ROOM_ID
 from collector.args import args
 
 

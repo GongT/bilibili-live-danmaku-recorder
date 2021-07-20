@@ -1,13 +1,12 @@
 import json
 import argparse
-from time import time
 from sys import stderr
 from pika import spec
 from pika.adapters.blocking_connection import BlockingChannel
 from sqlalchemy.util.langhelpers import md5_hex
 from mylib.mq import add_arguments, connect_message_queue
 from mylib.db import create_connection, find_table
-from mylib.constants import MSG_KIND_GIFT, MSG_KIND_NORMAL, MSG_KIND_GUARD, MSG_KIND_SUPER_CHAT, BODY_ADDON_KEY_ROOM_ID
+from mylib.constants import MSG_KIND_GIFT, MSG_KIND_NORMAL, MSG_KIND_GUARD, MSG_KIND_SUPER_CHAT, BODY_ADDON_KEY_ROOM_ID, MSG_KIND_INTERACT_WORD, MSG_KIND_ENTRY_EFFECT, MSG_KIND_BATTLE_START, MSG_KIND_BATTLE_END, MSG_KIND_BATTLE_SETTLE
 
 
 def split_room_id(body):
@@ -45,7 +44,6 @@ def callback(kind: str, ch: BlockingChannel, method: spec.Basic.Deliver, propert
         ch.basic_nack(method.delivery_tag)
     else:
         ch.basic_ack(method.delivery_tag)
-        pass
 
 
 def register_handler(kind):
@@ -53,22 +51,29 @@ def register_handler(kind):
     rmq.basic_consume(queue=kind, auto_ack=False, on_message_callback=cb)
 
 
-parser = argparse.ArgumentParser(description='直播弹幕数据保存')
-add_arguments(parser)
-parser.add_argument('--database', type=str, help='...', required=True)
-args = parser.parse_args()
+def main():
+    parser = argparse.ArgumentParser(description='直播弹幕数据保存')
+    add_arguments(parser)
+    parser.add_argument('--database', type=str, help='...', required=True)
+    args = parser.parse_args()
 
-engine = create_connection(args.database)
-rmq = connect_message_queue(args.server, args.cacert)
+    global engine, rmq
+    engine = create_connection(args.database)
+    rmq = connect_message_queue(args.server, args.cacert)
 
-register_handler(MSG_KIND_GIFT)
-register_handler(MSG_KIND_NORMAL)
-register_handler(MSG_KIND_GUARD)
-register_handler(MSG_KIND_SUPER_CHAT)
+    register_handler(MSG_KIND_GIFT)
+    register_handler(MSG_KIND_NORMAL)
+    register_handler(MSG_KIND_GUARD)
+    register_handler(MSG_KIND_SUPER_CHAT)
+    register_handler(MSG_KIND_INTERACT_WORD)
+    register_handler(MSG_KIND_ENTRY_EFFECT)
+    register_handler(MSG_KIND_BATTLE_START)
+    register_handler(MSG_KIND_BATTLE_END)
+    register_handler(MSG_KIND_BATTLE_SETTLE)
 
-try:
-    rmq.start_consuming()
-except KeyboardInterrupt:
-    pass
+    try:
+        rmq.start_consuming()
+    except KeyboardInterrupt:
+        pass
 
-rmq.close()
+    rmq.close()

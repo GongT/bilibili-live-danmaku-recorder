@@ -8,8 +8,36 @@
 		"**/site-packages/**/*.py",
 		"blivedm"
 	],
+	"files.exclude": {
+		"**/.git": true,
+		"**/.svn": true,
+		"**/.hg": true,
+		"**/CVS": true,
+		"**/.DS_Store": true,
+		".venv": true,
+		"**/__pycache__": true,
+	},
 	"python.envFile": "${workspaceFolder}/.env",
 	"[jsonc]": {
 		"editor.defaultFormatter": "vscode.json-language-features",
-	}
+	},
+	"[json]": {
+		"editor.defaultFormatter": "vscode.json-language-features",
+	},
+	"sqltools.connections": [
+		{
+			"mysqlOptions": {
+				"authProtocol": "default"
+			},
+			"previewLimit": 50,
+			"server": "localhost",
+			"port": 3306,
+			"driver": "MariaDB",
+			"name": "blivedm-record",
+			"database": "blivedm-record",
+			"username": "blivedm-record",
+			"password": "blivedm-record",
+			"socketPath": "/dev/shm/container-shared-socksets/mariadb.sock"
+		}
+	]
 }

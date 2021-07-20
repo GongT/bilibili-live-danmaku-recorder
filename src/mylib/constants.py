@@ -14,7 +14,3 @@ DB_COL_PK = '_id'
 DB_COL_TIME = '_recv_time'
 DB_COL_HASH = '_unique_data_hash'
 DB_COL_EX_FIELD = '_extra_fields'
-
-BATTLE_EVENT_START = 'start'
-BATTLE_EVENT_END = 'end'
-BATTLE_EVENT_SETTLE = 'settle'
