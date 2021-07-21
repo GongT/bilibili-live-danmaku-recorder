@@ -14,33 +14,35 @@ if not args.verbose:
     debug = lambda *_args: None
 
 
-async def on_interact_word(roomid, message):
+async def on_interact_word(roomid, raw):
+    message = raw['data']
     uid = message['uid']
     un = message['uname']
     debug(roomid, f'欢迎用户 {un}({uid}) 进入直播间')
-    return MSG_KIND_INTERACT_WORD
+    return (MSG_KIND_INTERACT_WORD, message)
 
 
-async def on_entry_effect(roomid, message):
+async def on_entry_effect(roomid, raw):
+    message = raw['data']
     uid = message['uid']
     um = message['copy_writing_v2']
     debug(roomid, f'进场特效 [{uid}]: {um}')
-    return MSG_KIND_ENTRY_EFFECT
+    return (MSG_KIND_ENTRY_EFFECT)
 
 
-async def on_battle_start(roomid, message):
+async def on_battle_start(roomid,  message):
     debug(roomid, "大乱斗开始", message)
-    return MSG_KIND_BATTLE_START
+    return (MSG_KIND_BATTLE_START, message)
 
 
-async def on_battle_end(roomid, message):
+async def on_battle_end(roomid,  message):
     debug(roomid, "大乱斗结束", message)
-    return MSG_KIND_BATTLE_END
+    return (MSG_KIND_BATTLE_END, message)
 
 
-async def on_battle_settle(roomid, message):
+async def on_battle_settle(roomid,  message):
     debug(roomid, "大乱斗结算", message)
-    return MSG_KIND_BATTLE_SETTLE
+    return (MSG_KIND_BATTLE_SETTLE, message)
 
 
 blacklist_message_ids = [
@@ -82,7 +84,7 @@ class BLiveDMBridge(BLiveClient):
         self.development_watch_message('WELCOME')
         self.development_watch_message('room_admin_entrance')
         self.development_watch_message('COMMON_NOTICE_DANMAKU')
-        self.development_watch_message('NOTICE_MSG')
+        # self.development_watch_message('NOTICE_MSG')
 
         self.register_message_handler('INTERACT_WORD', on_interact_word)
         self.register_message_handler('ENTRY_EFFECT', on_entry_effect)
@@ -112,13 +114,9 @@ class BLiveDMBridge(BLiveClient):
         await self.callback(self.room_id, MSG_KIND_SUPER_CHAT, message)
         debug(self.room_id, f'醒目留言 ¥{message.price} {message.uname}：{message.message}')
 
-    def register_message_handler(self, msg_type: str, handler: Callable[[int, Any], str]):
+    def register_message_handler(self, msg_type: str, handler: Callable[[int, Any], tuple[str, Any]]):
         async def _handler(s, raw):
-            if 'data' in raw:
-                data = raw['data']
-            else:
-                data = raw
-            msgtype = await handler(self.room_id, data)
+            (msgtype, data) = await handler(self.room_id, raw)
             if msgtype is None:
                 return
             await self.callback(self.room_id, msgtype, data)

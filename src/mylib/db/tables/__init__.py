@@ -71,7 +71,10 @@ class BaseTable():
 
             data_getter = getattr(self, 'get_column_' + col.name, None)
             if data_getter is None:
-                raise Exception(f"missing field {col.name}")
+                if col.default or col.nullable:
+                    continue
+                else:
+                    raise Exception(f"missing field {col.name}")
 
             ret = data_getter(data, col)
             if ret is None:

@@ -7,6 +7,7 @@ from sqlalchemy.util.langhelpers import md5_hex
 from mylib.mq import add_arguments, connect_message_queue
 from mylib.db import create_connection, find_table
 from mylib.constants import MSG_KIND_GIFT, MSG_KIND_NORMAL, MSG_KIND_GUARD, MSG_KIND_SUPER_CHAT, BODY_ADDON_KEY_ROOM_ID, MSG_KIND_INTERACT_WORD, MSG_KIND_ENTRY_EFFECT, MSG_KIND_BATTLE_START, MSG_KIND_BATTLE_END, MSG_KIND_BATTLE_SETTLE
+import traceback
 
 
 def split_room_id(body):
@@ -35,12 +36,11 @@ def handle_inner(kind: str, body: bytes):
 def callback(kind: str, ch: BlockingChannel, method: spec.Basic.Deliver, properties: spec.BasicProperties, body: bytes):
     try:
         handle_inner(kind, body)
-    except Exception as e:
-        print("failed handle message:", type(e).__name__, end='', file=stderr)
-        for i in e.args:
-            print(' ' + str(i), end='', file=stderr)
+    except Exception:
+        print(f"====================================\nfailed handle message: {kind}:", file=stderr)
+        print(body.decode('utf-8'), file=stderr)
+        print(traceback.format_exc(), file=stderr)
 
-        print(" | " + body.decode('utf-8'), file=stderr)
         ch.basic_nack(method.delivery_tag)
     else:
         ch.basic_ack(method.delivery_tag)
