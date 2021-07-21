@@ -27,20 +27,20 @@ async def on_entry_effect(roomid, raw):
     uid = message['uid']
     um = message['copy_writing_v2']
     debug(roomid, f'进场特效 [{uid}]: {um}')
-    return (MSG_KIND_ENTRY_EFFECT)
+    return (MSG_KIND_ENTRY_EFFECT, message)
 
 
-async def on_battle_start(roomid,  message):
+async def on_battle_start(roomid, message):
     debug(roomid, "大乱斗开始", message)
     return (MSG_KIND_BATTLE_START, message)
 
 
-async def on_battle_end(roomid,  message):
+async def on_battle_end(roomid, message):
     debug(roomid, "大乱斗结束", message)
     return (MSG_KIND_BATTLE_END, message)
 
 
-async def on_battle_settle(roomid,  message):
+async def on_battle_settle(roomid, message):
     debug(roomid, "大乱斗结算", message)
     return (MSG_KIND_BATTLE_SETTLE, message)
 
