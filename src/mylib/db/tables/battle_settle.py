@@ -13,7 +13,7 @@ class BattleSettleTable(BaseTable):
     def get_table_kind():
         return MSG_KIND_BATTLE_SETTLE
 
-    def get_column_winner(self, msg):
+    def get_column_winner(self, msg, col):
         return msg['data']['init_info']['winner_type'] > 0
 
     def create_columns(self) -> list[Column]:

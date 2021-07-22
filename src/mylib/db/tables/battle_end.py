@@ -13,10 +13,10 @@ class BattleEndTable(BaseTable):
     def get_table_kind():
         return MSG_KIND_BATTLE_END
 
-    def get_column_target_room(self, msg):
+    def get_column_target_room(self, msg, col):
         return msg['data']['match_info']['room_id']
 
-    def get_column_winner(self, msg):
+    def get_column_winner(self, msg, col):
         return msg['data']['init_info']['winner_type'] > 0
 
     def create_columns(self) -> list[Column]:

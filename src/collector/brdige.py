@@ -18,7 +18,7 @@ async def on_interact_word(roomid, raw):
     message = raw['data']
     uid = message['uid']
     un = message['uname']
-    debug(roomid, f'欢迎用户 {un}({uid}) 进入直播间')
+    debug(roomid, f'欢迎用户 [{uid}]: {un} 进入直播间')
     return (MSG_KIND_INTERACT_WORD, message)
 
 
@@ -104,7 +104,7 @@ class BLiveDMBridge(BLiveClient):
     async def _on_receive_gift(self, message: GiftMessage):
         await self.callback(self.room_id, MSG_KIND_GIFT, message)
         debug(self.room_id,
-              f'{message.uname} 赠送{message.gift_name}x{message.num} （{message.coin_type}币x{message.total_coin}）')
+              f'{message.uname} 赠送{message.gift_name} (x{message.num}) ({message.coin_type}币: {message.total_coin})')
 
     async def _on_buy_guard(self, message: GuardBuyMessage):
         await self.callback(self.room_id, MSG_KIND_GUARD, message)

@@ -11,11 +11,15 @@ else
 	IO_ARG=(--rm -it)
 fi
 
-IO_ARG+=("--volume=$(pwd):/__src:ro" "--volume=/dev/shm/container-shared-socksets:/dev/shm/container-shared-socksets")
+IO_ARG+=(
+	"--volume=$(pwd):/__src:ro"
+	"--volume=/dev/shm/container-shared-socksets:/dev/shm/container-shared-socksets"
+	"--network=host"
+)
 
 ARGS=(
 	"--database=mariadb+mysqldb://blivedm-record:blivedm-record@localhost:3306/blivedm-record?unix_socket=/dev/shm/container-shared-socksets/mariadb.sock"
-	"--server=test-username:test-password@10.0.0.102:5671"
+	"--server=test-username:test-password@127.0.0.1:5671"
 	"--cacert=/__src/rabbitmq/certs/server.crt"
 )
 

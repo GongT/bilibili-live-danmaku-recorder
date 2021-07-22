@@ -54,12 +54,10 @@ class BaseTable():
         ret = conn.execute(stmt)
         return ret.first()[0] > 0
 
-    def get_value(self, data, col):
-        raise Exception(f"missing field {col.name}")
-
     def do_insert(self, conn, hash: str, data: dict):
         row = {}
         row[DB_COL_HASH] = hash
+        original_data = data.copy()
         for col in self.table.columns:
             if is_special_key(col.key):
                 continue
@@ -76,7 +74,7 @@ class BaseTable():
                 else:
                     raise Exception(f"missing field {col.name}")
 
-            ret = data_getter(data, col)
+            ret = data_getter(original_data, col)
             if ret is None:
                 raise Exception(f"missing field {col.name}")
 

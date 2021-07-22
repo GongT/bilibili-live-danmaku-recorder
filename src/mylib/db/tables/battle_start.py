@@ -12,7 +12,7 @@ class BattleStartTable(BaseTable):
     def get_table_kind():
         return MSG_KIND_BATTLE_START
 
-    def get_column_target_room(self, msg):
+    def get_column_target_room(self, msg, col):
         return msg['data']['match_info']['room_id']
 
     def create_columns(self) -> list[Column]:
