@@ -33,7 +33,3 @@ def create_table_if_not(engine: Engine, table: Table):
         table.metadata.create_all(engine)
     else:
         print(f"使用数据表：{table.name}")
-
-
-def table_name(room_id: int, kind: str):
-    return str(room_id) + TABLE_SEP + kind

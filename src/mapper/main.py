@@ -22,7 +22,7 @@ def handle_inner(kind: str, body: bytes):
     if table is None:
         raise Exception(f"invalid message kind: {kind}")
 
-    hash = md5_hex(table.hash_row(json_data))
+    hash = table.hash_row(json_data)
 
     with engine.connect().execution_options(autocommit=True) as conn:
         exists = table.find_hash(conn, hash)

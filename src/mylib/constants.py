@@ -10,7 +10,8 @@ MSG_KIND_BATTLE_SETTLE = 'battle-settle'
 
 BODY_ADDON_KEY_ROOM_ID = 'recording_room_id'
 
-DB_COL_PK = '_id'
-DB_COL_TIME = '_recv_time'
-DB_COL_HASH = '_unique_data_hash'
-DB_COL_EX_FIELD = '_extra_fields'
+DB_COL_PK = 'id'
+DB_COL_TIME = 'recv_time'
+DB_COL_HASH = 'unique_data_hash'
+DB_COL_TYPE = 'type'
+DB_COL_CONTENT = 'message_content'
