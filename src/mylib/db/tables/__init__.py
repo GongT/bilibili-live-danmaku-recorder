@@ -43,6 +43,7 @@ class BaseTable():
         )
 
         Index('line_hash', self.table.c[DB_COL_HASH], mysql_using='hash', mariadb_using='hash', unique=True)
+        Index('type_index', self.table.c[DB_COL_TYPE], mysql_using='hash', mariadb_using='hash', unique=True)
 
         create_table_if_not(self.engine, self.table)
 

@@ -6,12 +6,12 @@ from pika import BasicProperties
 from pika.exceptions import UnroutableError, AMQPConnectionError, ChannelClosed, ChannelWrongStateError
 import json
 from collector.brdige import BLiveDMBridge
-from mylib.mq import connect_message_queue
+from mylib.mq import connect_message_queue, queue_name
 from mylib.constants import BODY_ADDON_KEY_ROOM_ID
 from collector.args import args
 
 
-def danmaku_filter():
+def danmaku_filter(*args):
     return True
 
 
@@ -63,7 +63,7 @@ async def create_log(room_id, kind, body):
     while True:
         try:
             rmq.basic_publish(exchange='',
-                              routing_key=kind,
+                              routing_key=queue_name(kind),
                               body=content,
                               properties=BasicProperties(content_type='application/json',
                                                          content_encoding='utf-8',

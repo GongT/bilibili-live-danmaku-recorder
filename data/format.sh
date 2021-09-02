@@ -12,5 +12,5 @@ for F in *.json5; do
 		[[ $LINE != //* ]] || continue
 		echo "$LINE" | sed 's/: None\b/: null/g' | json5
 		echo ""
-	done <"$F.json5" | jq -s >"$F.json"
+	done <"$F.json5" | jq -s --tab >"$F.json"
 done
